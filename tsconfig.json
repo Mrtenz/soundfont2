@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src/",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "commonjs",
+    "target": "es2017",
+    "noEmitOnError": true,
+    "strict": true,
+    "declaration": false,
+    "paths": {
+      "~/*": [
+        "*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

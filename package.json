@@ -1,0 +1,66 @@
+{
+  "name": "soundfont2",
+  "version": "0.1.0",
+  "description": "A SoundFont2 parser for Node.js and web browsers",
+  "main": "lib/SoundFont2.node.js",
+  "module": "lib/SoundFont2.js",
+  "typings": "typings/index.d.ts",
+  "keywords": [
+    "soundfont2",
+    "soundfont",
+    "sf2",
+    "midi",
+    "synthesizer"
+  ],
+  "author": "Maarten Zuidhoorn <maarten@zuidhoorn.com>",
+  "repository": "https://github.com/Mrtenz/soundfont2.git",
+  "license": "MIT",
+  "scripts": {
+    "tslint": "tslint --project .",
+    "clean": "rimraf ./lib ./typings",
+    "build": "webpack && yarn run build:declarations",
+    "build:declarations": "tsc --project tsconfig.json --declaration --declarationDir typings --emitDeclarationOnly",
+    "prepublishOnly": "yarn run clean && cross-env NODE_ENV=development yarn run build"
+  },
+  "files": [
+    "lib",
+    "src",
+    "typings"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "@types/node": "^10.12.18",
+    "@types/webpack": "^4.4.22",
+    "@types/webpack-merge": "^4.1.3",
+    "@types/webpack-node-externals": "^1.6.3",
+    "awesome-typescript-loader": "^5.2.1",
+    "cross-env": "^5.2.0",
+    "husky": "^1.3.1",
+    "lint-staged": "^8.1.0",
+    "prettier": "^1.15.3",
+    "rimraf": "^2.6.3",
+    "ts-node": "^7.0.1",
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
+    "tslint": "^5.12.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1",
+    "webpack-merge": "^4.2.1",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write --config ./.prettierrc --config-precedence file-override",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "post-commit": "git update-index --again",
+      "pre-commit": "yarn run tslint && lint-staged"
+    }
+  }
+}
