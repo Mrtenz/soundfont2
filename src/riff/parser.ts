@@ -35,7 +35,7 @@ export const getChunk = (buffer: Uint8Array, start: number): RIFFChunk => {
 
   // RIFF and LIST chunks can have sub-chunks
   let subChunks: RIFFChunk[] = [];
-  if (id === 'RIFF' || 'LIST') {
+  if (id === 'RIFF' || id === 'LIST') {
     subChunks = getSubChunks(buffer.subarray(start + 12));
   }
 
