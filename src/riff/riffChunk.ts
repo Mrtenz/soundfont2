@@ -1,4 +1,3 @@
-import { getSubChunks } from './parser';
 import { ChunkIterator } from './chunkIterator';
 import { getStringFromBuffer } from '~/utils';
 
@@ -24,16 +23,11 @@ export class RIFFChunk {
    */
   public readonly subChunks: RIFFChunk[];
 
-  public constructor(id: string, length: number, buffer: Uint8Array) {
+  public constructor(id: string, length: number, buffer: Uint8Array, subChunks: RIFFChunk[]) {
     this.id = id;
     this.length = length;
     this.buffer = buffer;
-    this.subChunks = [];
-
-    // RIFF and LIST chunks can have sub-chunks
-    if (this.id === 'RIFF' || this.id === 'LIST') {
-      this.subChunks = this.getSubChunks();
-    }
+    this.subChunks = subChunks;
   }
 
   /**
@@ -94,7 +88,7 @@ export class RIFFChunk {
    *
    * @param {number} [start] - The position where to start iterating. Defaults to 0.
    */
-  public iterator<T = any>(start: number = 0) {
+  public iterator<T = any>(start: number = 0): ChunkIterator<T> {
     return new ChunkIterator<T>(this, start);
   }
 
@@ -121,12 +115,5 @@ export class RIFFChunk {
    */
   private getBuffer(start: number, length: number): Uint8Array {
     return this.buffer.subarray(start, start + length);
-  }
-
-  /**
-   * Get all sub-chunks for the chunk. This will only work if the chunk is a RIFF or LIST chunk.
-   */
-  private getSubChunks(): RIFFChunk[] {
-    return getSubChunks(this.buffer.subarray(4));
   }
 }

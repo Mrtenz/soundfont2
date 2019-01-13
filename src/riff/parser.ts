@@ -19,7 +19,8 @@ export const parseBuffer = (buffer: Uint8Array): RIFFChunk => {
   }
 
   const newBuffer = buffer.subarray(8);
-  return new RIFFChunk(id, newBuffer.length, newBuffer);
+  const subChunks = getSubChunks(newBuffer.subarray(4));
+  return new RIFFChunk(id, newBuffer.length, newBuffer, subChunks);
 };
 
 /**
@@ -32,7 +33,13 @@ export const getChunk = (buffer: Uint8Array, start: number): RIFFChunk => {
   const id = getChunkId(buffer, start);
   const length = getChunkLength(buffer, start + 4);
 
-  return new RIFFChunk(id, length, buffer.subarray(start + 8));
+  // RIFF and LIST chunks can have sub-chunks
+  let subChunks: RIFFChunk[] = [];
+  if (id === 'RIFF' || 'LIST') {
+    subChunks = getSubChunks(buffer.subarray(start + 12));
+  }
+
+  return new RIFFChunk(id, length, buffer.subarray(start + 8), subChunks);
 };
 
 /**
