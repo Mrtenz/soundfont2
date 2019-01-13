@@ -1,6 +1,6 @@
 {
   "name": "soundfont2",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A SoundFont2 parser for Node.js and web browsers",
   "main": "lib/SoundFont2.node.js",
   "module": "lib/SoundFont2.js",
