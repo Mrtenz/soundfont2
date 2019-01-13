@@ -1,7 +1,7 @@
 import { SF2Chunk } from '~/chunk';
 import { ParseError } from '~/riff';
 import { SF_BAG_SIZE } from '~/constants';
-import { Generator, GeneratorType, Modulator, Zone, ZoneItems } from '~/types';
+import { Generator, GeneratorType, Modulator, Zone, ZoneItemsWithReference } from '~/types';
 
 /**
  * Get the preset or instrument zones from a chunk.
@@ -25,21 +25,27 @@ export const getZones = (chunk: SF2Chunk, type: 'pbag' | 'ibag'): Zone[] => {
 };
 
 /**
- * Get all modulators and generators in a preset or instrument.
+ * Get all modulators, generators and the instrument (for presets) or sample (for instruments) in a
+ * preset or instrument.
  *
  * @template T
+ * @template R
  * @param {T} headers - The preset or instrument headers
  * @param {Zone[]} zones - All zones for the preset or instrument
- * @param {Modulator[]} modulators - All modulators for the preset or instrument
- * @param {Generator[]} generators - All generators for the preset or instrument
+ * @param {Modulator[]} itemModulators - All modulators for the preset or instrument
+ * @param {Generator[]} itemGenerators - All generators for the preset or instrument
+ * @param {R[]} references - The instruments or samples to reference in the zone
+ * @param {GeneratorType} referenceType - The generator type to reference it by
  */
-export const getItemsInZone = <T extends { bagIndex: number }>(
+export const getItemsInZone = <T extends { bagIndex: number }, R>(
   headers: T[],
   zones: Zone[],
-  modulators: Modulator[],
-  generators: Generator[]
-): { header: T; zones: ZoneItems[] }[] => {
-  const items: { header: T; zones: ZoneItems[] }[] = [];
+  itemModulators: Modulator[],
+  itemGenerators: Generator[],
+  references: R[],
+  referenceType: GeneratorType
+): { header: T; zones: ZoneItemsWithReference<R>[] }[] => {
+  const items: { header: T; zones: ZoneItemsWithReference<R>[] }[] = [];
 
   for (let i = 0; i < headers.length; i++) {
     const header = headers[i];
@@ -48,12 +54,29 @@ export const getItemsInZone = <T extends { bagIndex: number }>(
     const start = header.bagIndex;
     const end = next ? next.bagIndex : zones.length;
 
-    const zoneItems: ZoneItems[] = [];
+    const zoneItems: ZoneItemsWithReference<R>[] = [];
 
     for (let j = start; j < end; j++) {
+      const modulators = getModulators(j, zones, itemModulators);
+      const generators = getGenerators(j, zones, itemGenerators);
+
+      const keyRange =
+        generators[GeneratorType.KeyRange] && generators[GeneratorType.KeyRange]!.range;
+      const referenceId = generators[referenceType];
+      if (!referenceId) {
+        continue;
+      }
+
+      const reference = references[referenceId.amount!];
+      if (!reference) {
+        continue;
+      }
+
       zoneItems.push({
-        modulators: getModulators(j, zones, modulators),
-        generators: getGenerators(j, zones, generators)
+        keyRange,
+        modulators,
+        generators,
+        reference
       });
     }
 

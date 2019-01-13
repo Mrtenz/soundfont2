@@ -68,6 +68,22 @@ export enum GeneratorType {
   Dummy
 }
 
+/**
+ * Describes a range of MIDI key numbers (for the `keyRange` generator) or MIDI velocities (for the
+ * `velRange` generator) with a minimum (lo) and maximum (hi) value.
+ */
+export interface Range {
+  /**
+   * Low value for the range.
+   */
+  lo: number;
+
+  /**
+   * High value for the range.
+   */
+  hi: number;
+}
+
 export interface Generator {
   /**
    * The ID of the generator.

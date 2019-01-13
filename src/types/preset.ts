@@ -1,4 +1,5 @@
 import { ZoneItems } from './zone';
+import { Instrument } from './instrument';
 
 export interface PresetHeader {
   /**
@@ -29,7 +30,21 @@ export interface PresetHeader {
   morphology: number;
 }
 
+export interface PresetZone extends ZoneItems {
+  /**
+   * The instrument for the preset zone.
+   */
+  instrument: Instrument;
+}
+
 export interface Preset {
+  /**
+   * The preset header.
+   */
   header: PresetHeader;
-  zones: ZoneItems[];
+
+  /**
+   * The preset zones.
+   */
+  zones: PresetZone[];
 }

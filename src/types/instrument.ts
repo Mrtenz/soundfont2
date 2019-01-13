@@ -1,4 +1,5 @@
 import { ZoneItems } from './zone';
+import { Sample } from './sample';
 
 export interface InstrumentHeader {
   /**
@@ -12,7 +13,21 @@ export interface InstrumentHeader {
   bagIndex: number;
 }
 
+export interface InstrumentZone extends ZoneItems {
+  /**
+   * The sample for the instrument zone.
+   */
+  sample: Sample;
+}
+
 export interface Instrument {
+  /**
+   * The instrument header.
+   */
   header: InstrumentHeader;
-  zones: ZoneItems[];
+
+  /**
+   * The instrument zones.
+   */
+  zones: InstrumentZone[];
 }

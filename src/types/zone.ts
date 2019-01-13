@@ -1,5 +1,5 @@
 import { Modulator } from './modulator';
-import { Generator, GeneratorType } from './generator';
+import { Generator, GeneratorType, Range } from './generator';
 
 /**
  * Describes the generator and modulator index for a preset or instrument zone, defined to play
@@ -22,6 +22,25 @@ export interface Zone {
 }
 
 export interface ZoneItems {
+  /**
+   * The key range for the zone.
+   */
+  keyRange?: Range;
+
+  /**
+   * The modulators in the zone.
+   */
   modulators: { [key in GeneratorType]?: Modulator };
+
+  /**
+   * The generators in the zone.
+   */
   generators: { [key in GeneratorType]?: Generator };
+}
+
+export interface ZoneItemsWithReference<R> extends ZoneItems {
+  /**
+   * Generic reference to an item in the zone.
+   */
+  reference: R;
 }

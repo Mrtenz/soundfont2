@@ -1,7 +1,14 @@
-import { Instrument, MetaData, Preset, PresetData, Sample, SampleData } from './types';
+import {
+  GeneratorType,
+  Instrument,
+  MetaData,
+  Preset,
+  PresetData,
+  Sample,
+  SampleData
+} from './types';
 import { SF2Chunk } from './chunk';
 import { parseBuffer, ParseError } from './riff';
-import { DEFAULT_SAMPLE_RATE } from './constants';
 import { getItemsInZone } from './chunks';
 
 export class SoundFont2 {
@@ -36,9 +43,14 @@ export class SoundFont2 {
   public readonly metaData: MetaData;
 
   /**
-   * The sample data.
+   * The raw sample data.
    */
   public readonly sampleData: SampleData;
+
+  /**
+   * The parsed samples.
+   */
+  public readonly samples: Sample[];
 
   /**
    * The unparsed preset data.
@@ -46,28 +58,24 @@ export class SoundFont2 {
   public readonly presetData: PresetData;
 
   /**
-   * The parsed presets.
-   */
-  public readonly presets: Preset[];
-
-  /**
    * The parsed instuments.
    */
   public readonly instruments: Instrument[];
 
   /**
-   * The parsed samples.
+   * The parsed presets.
    */
-  public readonly samples: Sample[];
+  public readonly presets: Preset[];
 
   public constructor(chunk: SF2Chunk) {
     this.chunk = chunk;
     this.metaData = chunk.subChunks[0].getMetaData();
     this.sampleData = chunk.subChunks[1].getSampleData();
     this.presetData = chunk.subChunks[2].getPresetData();
-    this.presets = this.getPresets();
-    this.instruments = this.getInstruments();
+
     this.samples = this.getSamples();
+    this.instruments = this.getInstruments();
+    this.presets = this.getPresets();
   }
 
   /**
@@ -76,7 +84,28 @@ export class SoundFont2 {
   private getPresets(): Preset[] {
     const { presetHeaders, presetZones, presetGenerators, presetModulators } = this.presetData;
 
-    return getItemsInZone(presetHeaders, presetZones, presetModulators, presetGenerators);
+    const presets = getItemsInZone(
+      presetHeaders,
+      presetZones,
+      presetModulators,
+      presetGenerators,
+      this.instruments,
+      GeneratorType.Instrument
+    );
+
+    return presets.map(preset => {
+      return {
+        header: preset.header,
+        zones: preset.zones.map(zone => {
+          return {
+            keyRange: zone.keyRange,
+            generators: zone.generators,
+            modulators: zone.modulators,
+            instrument: zone.reference
+          };
+        })
+      };
+    });
   }
 
   /**
@@ -90,19 +119,33 @@ export class SoundFont2 {
       instrumentGenerators
     } = this.presetData;
 
-    return getItemsInZone(
+    const instruments = getItemsInZone(
       instrumentHeaders,
       instrumentZones,
       instrumentModulators,
-      instrumentGenerators
+      instrumentGenerators,
+      this.samples,
+      GeneratorType.SampleId
     );
+
+    return instruments.map(instrument => {
+      return {
+        header: instrument.header,
+        zones: instrument.zones.map(zone => {
+          return {
+            keyRange: zone.keyRange,
+            generators: zone.generators,
+            modulators: zone.modulators,
+            sample: zone.reference
+          };
+        })
+      };
+    });
   }
 
   /**
-   * Parse the raw sample data and sample headers to samples. If the sample rate of the sample is
-   * lower than the default sample rate, it is increased by multiplying the bytes. The raw sample
-   * data is converted to a signed 16-bit integer array, since WAV samples (used by SF2) are
-   * 16-bit.
+   * Parse the raw sample data and sample headers to samples. The sample data should be converted
+   * to a 16-bit array before playing it, since WAV files are usually 16-bit.
    */
   private getSamples(): Sample[] {
     return this.presetData.sampleHeaders.map(header => {
@@ -118,26 +161,7 @@ export class SoundFont2 {
         header.originalPitch = 60;
       }
 
-      let data = new Int16Array(
-        new Uint8Array(this.sampleData.subarray(header.start * 2, header.end * 2))
-      );
-
-      if (header.name !== 'EOS') {
-        while (header.sampleRate < DEFAULT_SAMPLE_RATE) {
-          const newSample = new Int16Array(data.length * 2);
-          let j;
-          for (let i = (j = 0); i < data.length; i++) {
-            newSample[j++] = data[i];
-            newSample[j++] = data[i];
-          }
-
-          data = newSample;
-
-          header.sampleRate *= 2;
-          header.startLoop *= 2;
-          header.endLoop *= 2;
-        }
-      }
+      const data = this.sampleData.subarray(header.start, header.end);
 
       return {
         header,
