@@ -14,8 +14,7 @@ const config: Configuration = {
   },
   output: {
     path: path.resolve(__dirname, 'lib'),
-    library: 'SoundFont2',
-    libraryExport: 'default'
+    library: 'SoundFont2'
   },
   resolve: {
     extensions: ['.ts'],
@@ -27,11 +26,11 @@ const config: Configuration = {
         test: /\.ts$/,
         use: [
           {
-            loader: 'awesome-typescript-loader',
+            loader: 'babel-loader',
             options: {
-              useCache: true,
-              useBabel: true,
-              babelCore: '@babel/core'
+              cacheDirectory: true,
+              presets: ['@babel/preset-env', '@babel/preset-typescript'],
+              plugins: ['@babel/plugin-proposal-class-properties']
             }
           }
         ],
@@ -39,7 +38,7 @@ const config: Configuration = {
       }
     ]
   },
-  devtool: 'source-map'
+  devtool: 'inline-source-map'
 };
 
 /**

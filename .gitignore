@@ -26,5 +26,4 @@ typings/
 .next
 
 # Webpack
-.awcache
 lib
