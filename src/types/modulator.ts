@@ -1,3 +1,19 @@
+export enum TransformType {
+  /**
+   * The output value of the multiplier is fed directly to the summing node of the given
+   * destination.
+   */
+  Linear = 0,
+
+  /**
+   * The output value of the multiplier is to be the absolute value of the input value, as defined
+   * by the relationship:
+   *
+   * `output = Math.sqrt(input ** 2)`
+   */
+  Absolute = 2
+}
+
 export interface Modulator {
   /**
    * Destination generator.
@@ -24,5 +40,5 @@ export interface Modulator {
   /**
    * Transform applied to source.
    */
-  transform: number;
+  transform: TransformType;
 }
