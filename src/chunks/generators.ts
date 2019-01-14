@@ -38,15 +38,9 @@ const INSTRUMENT_TYPES_BLACKLIST: number[] = [
 ];
 
 /**
- * These GeneratorTypes specify a range of key numbers (KeyRange, Keynum) or velocity (VelRange,
- * Velocity) instead of a amount.
+ * These GeneratorTypes specify a range of key numbers or velocity.
  */
-const RANGE_TYPES: number[] = [
-  GeneratorType.KeyRange,
-  GeneratorType.VelRange,
-  GeneratorType.Keynum,
-  GeneratorType.Velocity
-];
+const RANGE_TYPES: number[] = [GeneratorType.KeyRange, GeneratorType.VelRange];
 
 /**
  * Get all generators for either an preset generator chunk or a instrument generator chunk.
