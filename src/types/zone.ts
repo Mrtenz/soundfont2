@@ -21,6 +21,8 @@ export interface Zone {
   modulatorIndex: number;
 }
 
+export type ZoneMap<T extends Modulator | Generator> = { [key in GeneratorType]?: T };
+
 export interface ZoneItems {
   /**
    * The key range for the zone.
@@ -30,12 +32,12 @@ export interface ZoneItems {
   /**
    * The modulators in the zone.
    */
-  modulators: { [key in GeneratorType]?: Modulator };
+  modulators: ZoneMap<Modulator>;
 
   /**
    * The generators in the zone.
    */
-  generators: { [key in GeneratorType]?: Generator };
+  generators: ZoneMap<Generator>;
 }
 
 export interface ZoneItemsWithReference<R> extends ZoneItems {

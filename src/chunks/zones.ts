@@ -1,7 +1,14 @@
 import { SF2Chunk } from '~/chunk';
 import { ParseError } from '~/riff';
 import { SF_BAG_SIZE } from '~/constants';
-import { Generator, GeneratorType, Modulator, Zone, ZoneItemsWithReference } from '~/types';
+import {
+  Generator,
+  GeneratorType,
+  Modulator,
+  Zone,
+  ZoneItemsWithReference,
+  ZoneMap
+} from '~/types';
 
 /**
  * Get the preset or instrument zones from a chunk.
@@ -97,7 +104,11 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
  * @param {Zone[]} zones - ALl zones for the preset or instrument
  * @param {Modulator[]} modulators - All modulators for the preset or instrument
  */
-const getModulators = (index: number, zones: Zone[], modulators: Modulator[]) => {
+const getModulators = (
+  index: number,
+  zones: Zone[],
+  modulators: Modulator[]
+): ZoneMap<Modulator> => {
   const zone = zones[index];
   const next = zones[index + 1];
 
@@ -115,7 +126,11 @@ const getModulators = (index: number, zones: Zone[], modulators: Modulator[]) =>
  * @param {Zone[]} zones - ALl zones for the preset or instrument
  * @param {Generator[]} generators - All generators for the preset or instrument
  */
-const getGenerators = (index: number, zones: Zone[], generators: Generator[]) => {
+const getGenerators = (
+  index: number,
+  zones: Zone[],
+  generators: Generator[]
+): ZoneMap<Generator> => {
   const zone = zones[index];
   const next = zones[index + 1];
 
@@ -139,7 +154,7 @@ const getZone = <T extends { id: GeneratorType }>(
   end: number,
   items: T[]
 ): { [key in GeneratorType]?: T } => {
-  const itemsObject: { [key in GeneratorType]?: T } = {};
+  const itemsObject: ZoneMap<T> = {};
 
   for (let i = start; i < end; i++) {
     const item = items[i];
