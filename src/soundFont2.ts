@@ -186,19 +186,21 @@ export class SoundFont2 {
       GeneratorType.Instrument
     );
 
-    return presets.map(preset => {
-      return {
-        header: preset.header,
-        zones: preset.zones.map(zone => {
-          return {
-            keyRange: zone.keyRange,
-            generators: zone.generators,
-            modulators: zone.modulators,
-            instrument: zone.reference
-          };
-        })
-      };
-    });
+    return presets
+      .filter(preset => preset.header.name !== 'EOP')
+      .map(preset => {
+        return {
+          header: preset.header,
+          zones: preset.zones.map(zone => {
+            return {
+              keyRange: zone.keyRange,
+              generators: zone.generators,
+              modulators: zone.modulators,
+              instrument: zone.reference
+            };
+          })
+        };
+      });
   }
 
   /**
@@ -221,47 +223,51 @@ export class SoundFont2 {
       GeneratorType.SampleId
     );
 
-    return instruments.map(instrument => {
-      return {
-        header: instrument.header,
-        zones: instrument.zones.map(zone => {
-          return {
-            keyRange: zone.keyRange,
-            generators: zone.generators,
-            modulators: zone.modulators,
-            sample: zone.reference
-          };
-        })
-      };
-    });
+    return instruments
+      .filter(instrument => instrument.header.name !== 'EOI')
+      .map(instrument => {
+        return {
+          header: instrument.header,
+          zones: instrument.zones.map(zone => {
+            return {
+              keyRange: zone.keyRange,
+              generators: zone.generators,
+              modulators: zone.modulators,
+              sample: zone.reference
+            };
+          })
+        };
+      });
   }
 
   /**
    * Parse the raw sample data and sample headers to samples.
    */
   private getSamples(): Sample[] {
-    return this.presetData.sampleHeaders.map(header => {
-      // Sample rate must be above 0
-      if (header.name !== 'EOS' && header.sampleRate <= 0) {
-        throw new Error(
-          `Illegal sample rate of ${header.sampleRate} hz in sample '${header.name}'`
+    return this.presetData.sampleHeaders
+      .filter(sample => sample.name !== 'EOS')
+      .map(header => {
+        // Sample rate must be above 0
+        if (header.name !== 'EOS' && header.sampleRate <= 0) {
+          throw new Error(
+            `Illegal sample rate of ${header.sampleRate} hz in sample '${header.name}'`
+          );
+        }
+
+        // Original pitch cannot be between 128 and 254
+        if (header.originalPitch >= 128 && header.originalPitch <= 254) {
+          header.originalPitch = 60;
+        }
+
+        // Turns the Uint8Array into a Int16Array
+        const data = new Int16Array(
+          new Uint8Array(this.sampleData.subarray(header.start * 2, header.end * 2)).buffer
         );
-      }
 
-      // Original pitch cannot be between 128 and 254
-      if (header.originalPitch >= 128 && header.originalPitch <= 254) {
-        header.originalPitch = 60;
-      }
-
-      // Turns the Uint8Array into a Int16Array
-      const data = new Int16Array(
-        new Uint8Array(this.sampleData.subarray(header.start * 2, header.end * 2)).buffer
-      );
-
-      return {
-        header,
-        data
-      };
-    });
+        return {
+          header,
+          data
+        };
+      });
   }
 }
