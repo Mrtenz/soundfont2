@@ -8,19 +8,19 @@ import { SF_GENERATOR_SIZE } from '~/constants';
  * is found, the generator should be ignored.
  */
 const PRESET_TYPES_BLACKLIST: number[] = [
-  GeneratorType.StartAddrOfs,
-  GeneratorType.EndAddrOfs,
-  GeneratorType.StartLoopAddrOfs,
-  GeneratorType.EndLoopAddrOfs,
-  GeneratorType.StartAddrCoarseOfs,
-  GeneratorType.EndAddrCoarseOfs,
-  GeneratorType.StartLoopAddrCoarseOfs,
-  GeneratorType.Keynum,
+  GeneratorType.StartAddrsOffset,
+  GeneratorType.EndAddrsOffset,
+  GeneratorType.StartLoopAddrsOffset,
+  GeneratorType.EndLoopAddrsOffset,
+  GeneratorType.StartAddrsCoarseOffset,
+  GeneratorType.EndAddrsCoarseOffset,
+  GeneratorType.StartLoopAddrsCoarseOffset,
+  GeneratorType.KeyNum,
   GeneratorType.Velocity,
-  GeneratorType.EndLoopAddrCoarseOfs,
+  GeneratorType.EndLoopAddrsCoarseOffset,
   GeneratorType.SampleModes,
   GeneratorType.ExclusiveClass,
-  GeneratorType.OverrideRootKey
+  GeneratorType.OverridingRootKey
 ];
 
 /**
@@ -80,8 +80,8 @@ export const getGenerators = (chunk: SF2Chunk, type: 'pgen' | 'igen'): Generator
       return {
         id,
         range: {
-          hi: iterator.getByte(),
-          lo: iterator.getByte()
+          lo: iterator.getByte(),
+          hi: iterator.getByte()
         }
       };
     }
