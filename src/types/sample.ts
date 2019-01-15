@@ -1,9 +1,9 @@
 /**
  * SoundFont2 samples are in the WAV format, meaning that they consist of a signed 16-bit array,
- * instead of a unsigned 8-bit array. The raw sample data should be converted to a 16-bit array
- * before playing.
+ * instead of a unsigned 8-bit array, which is read by default. The sample data in the `smpl`
+ * sub-chunk is parsed as Int16Array before creating a sample.
  */
-export type SampleData = Uint8Array;
+export type SampleData = Int16Array;
 
 /**
  * The sample type, found in the `type` field in the header.
@@ -79,7 +79,7 @@ export interface SampleHeader {
   link: number;
 
   /**
-   * Indicated the type of sample.
+   * Indicates the type of sample.
    */
   type: SampleType;
 }
@@ -91,7 +91,7 @@ export interface Sample {
   header: SampleHeader;
 
   /**
-   * The raw sample data.
+   * The sample data parsed as Int16Array.
    */
   data: SampleData;
 }

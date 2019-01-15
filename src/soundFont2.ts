@@ -45,7 +45,7 @@ export class SoundFont2 {
   /**
    * The raw sample data.
    */
-  public readonly sampleData: SampleData;
+  public readonly sampleData: Uint8Array;
 
   /**
    * The parsed samples.
@@ -144,8 +144,7 @@ export class SoundFont2 {
   }
 
   /**
-   * Parse the raw sample data and sample headers to samples. The sample data should be converted
-   * to a 16-bit array before playing it, since WAV files are usually 16-bit.
+   * Parse the raw sample data and sample headers to samples.
    */
   private getSamples(): Sample[] {
     return this.presetData.sampleHeaders.map(header => {
@@ -161,7 +160,10 @@ export class SoundFont2 {
         header.originalPitch = 60;
       }
 
-      const data = this.sampleData.subarray(header.start, header.end);
+      // Turns the Uint8Array into a Int16Array
+      const data = new Int16Array(
+        new Uint8Array(this.sampleData.subarray(header.start * 2, header.end * 2)).buffer
+      );
 
       return {
         header,
