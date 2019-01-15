@@ -1,15 +1,18 @@
 import {
+  Bank,
   GeneratorType,
   Instrument,
+  Key,
   MetaData,
   Preset,
   PresetData,
   Sample,
-  SampleData
+  ZoneItems
 } from './types';
 import { SF2Chunk } from './chunk';
 import { parseBuffer, ParseError } from './riff';
 import { getItemsInZone } from './chunks';
+import { memoize } from './utils';
 
 export class SoundFont2 {
   /**
@@ -67,6 +70,11 @@ export class SoundFont2 {
    */
   public readonly presets: Preset[];
 
+  /**
+   * The parsed banks.
+   */
+  public readonly banks: Bank[];
+
   public constructor(chunk: SF2Chunk) {
     this.chunk = chunk;
     this.metaData = chunk.subChunks[0].getMetaData();
@@ -76,6 +84,91 @@ export class SoundFont2 {
     this.samples = this.getSamples();
     this.instruments = this.getInstruments();
     this.presets = this.getPresets();
+    this.banks = this.getBanks();
+  }
+
+  /**
+   * Get the key data by MIDI bank, preset and key number. May return null if no instrument was
+   * found for the given inputs. Note that this does not process any of the generators that are
+   * specific to the key number.
+   *
+   * The result is memoized based on all arguments, to prevent having to check all presets,
+   * instruments etc. every time.
+   *
+   * @param {number} memoizedKeyNumber - The MIDI key number
+   * @param {number} [memoizedBankNumber] - The bank index number, defaults to 0
+   * @param {number} [memoizedPresetNumber] - The preset number, defaults to 0
+   */
+  public getKeyData(
+    memoizedKeyNumber: number,
+    memoizedBankNumber: number = 0,
+    memoizedPresetNumber: number = 0
+  ): Key | null {
+    // Get a memoized version of the function
+    return memoize(
+      (keyNumber: number, bankNumber: number, presetNumber: number): Key | null => {
+        const bank = this.banks[bankNumber];
+        if (bank) {
+          const preset = bank.presets[presetNumber];
+          if (preset) {
+            const presetZone = preset.zones.find(zone => this.isKeyInRange(zone, keyNumber));
+            if (presetZone) {
+              const instrument = presetZone.instrument;
+              const instrumentZone = instrument.zones.find(zone =>
+                this.isKeyInRange(zone, keyNumber)
+              );
+              if (instrumentZone) {
+                const sample = instrumentZone.sample;
+                const generators = { ...presetZone.generators, ...instrumentZone.generators };
+                const modulators = { ...presetZone.modulators, ...instrumentZone.modulators };
+
+                return {
+                  keyNumber,
+                  preset,
+                  instrument,
+                  sample,
+                  generators,
+                  modulators
+                };
+              }
+            }
+          }
+        }
+
+        return null;
+      }
+    )(memoizedKeyNumber, memoizedBankNumber, memoizedPresetNumber);
+  }
+
+  /**
+   * Checks if a MIDI key number is in the range of a zone.
+   *
+   * @param {ZoneItems} zone - The zone to check
+   * @param {number} keyNumber - The MIDI key number, must be between 0 and 127
+   */
+  private isKeyInRange(zone: ZoneItems, keyNumber: number): boolean {
+    return (
+      zone.keyRange === undefined ||
+      (zone.keyRange.lo <= keyNumber && zone.keyRange.hi >= keyNumber)
+    );
+  }
+
+  /**
+   * Parse the presets to banks.
+   */
+  private getBanks(): Bank[] {
+    return this.presets.reduce<Bank[]>((target, preset) => {
+      const bankNumber = preset.header.bank;
+
+      if (!target[bankNumber]) {
+        target[bankNumber] = {
+          presets: []
+        };
+      }
+
+      target[bankNumber].presets[preset.header.preset] = preset;
+      return target;
+    }, []);
   }
 
   /**

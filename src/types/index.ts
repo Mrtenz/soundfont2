@@ -1,5 +1,7 @@
+export * from './bank';
 export * from './generator';
 export * from './instrument';
+export * from './key';
 export * from './metaData';
 export * from './modulator';
 export * from './preset';
