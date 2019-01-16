@@ -277,7 +277,7 @@ export enum GeneratorType {
 
   /**
    * Forces the MIDI key number to be interpreted as the value given. This can only appear at
-   * instrument leven and must be between 0 and 127.
+   * instrument level and must be between 0 and 127.
    */
   KeyNum,
 
