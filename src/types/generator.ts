@@ -366,9 +366,41 @@ export enum GeneratorType {
 }
 
 /**
+ * All unused generators.
+ */
+export type UnusedGenerator =
+  | GeneratorType.Unused1
+  | GeneratorType.Unused2
+  | GeneratorType.Unused3
+  | GeneratorType.Unused4
+  | GeneratorType.Unused5
+  | GeneratorType.Reserved1
+  | GeneratorType.Reserved2
+  | GeneratorType.Reserved3
+  | GeneratorType.EndOper;
+
+/**
+ * All range generators.
+ */
+export type RangeGenerator = GeneratorType.KeyRange | GeneratorType.VelRange;
+
+/**
+ * All index generators.
+ */
+export type IndexGenerator = GeneratorType.Instrument | GeneratorType.SampleId;
+
+/**
+ * All value generators.
+ */
+export type ValueGenerator = Exclude<
+  GeneratorType,
+  UnusedGenerator | RangeGenerator | IndexGenerator
+>;
+
+/**
  * The default value for all generator types (where applicable).
  */
-export const DEFAULT_GENERATOR_VALUES: { [key in GeneratorType]: number } = {
+export const DEFAULT_GENERATOR_VALUES: { [key in ValueGenerator]: number } = {
   [GeneratorType.StartAddrsOffset]: 0,
   [GeneratorType.EndAddrsOffset]: 0,
   [GeneratorType.StartLoopAddrsOffset]: 0,
@@ -416,28 +448,7 @@ export const DEFAULT_GENERATOR_VALUES: { [key in GeneratorType]: number } = {
   [GeneratorType.SampleModes]: 0,
   [GeneratorType.ScaleTuning]: 100,
   [GeneratorType.ExclusiveClass]: 0,
-  [GeneratorType.OverridingRootKey]: -1,
-
-  /**
-   * Not applicable.
-   */
-  [GeneratorType.Instrument]: -1,
-  [GeneratorType.KeyRange]: -1,
-  [GeneratorType.VelRange]: -1,
-  [GeneratorType.SampleId]: -1,
-
-  /**
-   * Unused generators.
-   */
-  [GeneratorType.Unused1]: -1,
-  [GeneratorType.Unused2]: -1,
-  [GeneratorType.Unused3]: -1,
-  [GeneratorType.Unused4]: -1,
-  [GeneratorType.Unused5]: -1,
-  [GeneratorType.Reserved1]: -1,
-  [GeneratorType.Reserved2]: -1,
-  [GeneratorType.Reserved3]: -1,
-  [GeneratorType.EndOper]: -1
+  [GeneratorType.OverridingRootKey]: -1
 };
 
 /**
