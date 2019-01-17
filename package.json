@@ -17,6 +17,7 @@
   "license": "MIT",
   "scripts": {
     "tslint": "tslint --project .",
+    "test": "jest",
     "clean": "rimraf ./lib ./typings",
     "build": "yarn run build:declarations && webpack",
     "build:declarations": "tsc --project tsconfig.json --declaration --declarationDir typings --emitDeclarationOnly",
@@ -32,6 +33,7 @@
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-typescript": "^7.1.0",
+    "@types/jest": "^23.3.12",
     "@types/node": "^10.12.18",
     "@types/webpack": "^4.4.22",
     "@types/webpack-merge": "^4.1.3",
@@ -40,9 +42,11 @@
     "babel-loader": "^8.0.5",
     "cross-env": "^5.2.0",
     "husky": "^1.3.1",
+    "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
     "prettier": "^1.15.3",
     "rimraf": "^2.6.3",
+    "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "tslint": "^5.12.0",
@@ -63,7 +67,7 @@
   "husky": {
     "hooks": {
       "post-commit": "git update-index --again",
-      "pre-commit": "yarn run tslint && lint-staged"
+      "pre-commit": "yarn run tslint && yarn run test && lint-staged"
     }
   }
 }
