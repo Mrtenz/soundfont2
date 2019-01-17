@@ -259,6 +259,9 @@ export class SoundFont2 {
           header.originalPitch = 60;
         }
 
+        header.startLoop -= header.start;
+        header.endLoop -= header.start;
+
         // Turns the Uint8Array into a Int16Array
         const data = new Int16Array(
           new Uint8Array(this.sampleData.subarray(header.start * 2, header.end * 2)).buffer
