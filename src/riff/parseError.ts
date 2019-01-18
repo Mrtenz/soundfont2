@@ -5,6 +5,8 @@ export class ParseError extends Error {
   public constructor(message: string);
   public constructor(message: string, expected: string, received: string);
   public constructor(message: string, expected?: string, received?: string) {
-    super(`${message}${expected && received && `, expected ${expected}, received ${received}`}`);
+    super(
+      `${message}${expected && received ? `, expected ${expected}, received ${received}` : ``}`
+    );
   }
 }
