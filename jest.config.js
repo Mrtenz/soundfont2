@@ -11,6 +11,6 @@ module.exports = {
     '~/(.*)': '<rootDir>/src/$1'
   },
   globals: {
-    TextDecoder: TextDecoder
+    TextDecoder: require('util').TextDecoder
   }
 };
