@@ -1,7 +1,8 @@
 module.exports = {
+  testEnvironment: 'node',
   preset: 'ts-jest',
   testMatch: [
-    '**/tests/**/*.ts'
+    '**/tests/**/*.test.ts'
   ],
   moduleFileExtensions: [
     'ts',
@@ -10,7 +11,7 @@ module.exports = {
   moduleNameMapper: {
     '~/(.*)': '<rootDir>/src/$1'
   },
-  globals: {
-    TextDecoder: require('util').TextDecoder
-  }
+  setupFiles: [
+    '<rootDir>/jest.setup.js'
+  ]
 };
