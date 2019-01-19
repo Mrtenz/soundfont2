@@ -19,20 +19,10 @@ export class SoundFont2 {
    * Create a new `SoundFont2` instance from a raw input buffer.
    *
    * @param {Uint8Array} buffer
+   * @deprecated Replaced with `new SoundFont2(buffer: Uint8Array);`
    */
   public static from(buffer: Uint8Array): SoundFont2 {
-    const chunk = parseBuffer(buffer);
-    const sf2Chunk = new SF2Chunk(chunk);
-
-    if (sf2Chunk.subChunks.length !== 3) {
-      throw new ParseError(
-        'Invalid sfbk structure',
-        '3 chunks',
-        `${chunk.subChunks.length} chunks`
-      );
-    }
-
-    return new SoundFont2(sf2Chunk);
+    return new SoundFont2(buffer);
   }
 
   /**
@@ -75,7 +65,27 @@ export class SoundFont2 {
    */
   public readonly banks: Bank[];
 
-  public constructor(chunk: SF2Chunk) {
+  /**
+   * Load a SoundFont2 file from a `Uint8Array` or a `SF2Chunk`. The recommended way is to use a
+   * Uint8Array, loading a SoundFont2 from a `SF2Chunk` only exists for backwards compatibility and
+   * will likely be removed in a future version.
+   *
+   * @param {Uint8Array|SF2Chunk} chunk
+   */
+  public constructor(chunk: Uint8Array | SF2Chunk) {
+    if (!(chunk instanceof SF2Chunk)) {
+      const parsedBuffer = parseBuffer(chunk);
+      chunk = new SF2Chunk(parsedBuffer);
+    }
+
+    if (chunk.subChunks.length !== 3) {
+      throw new ParseError(
+        'Invalid sfbk structure',
+        '3 chunks',
+        `${chunk.subChunks.length} chunks`
+      );
+    }
+
     this.chunk = chunk;
     this.metaData = chunk.subChunks[0].getMetaData();
     this.sampleData = chunk.subChunks[1].getSampleData();

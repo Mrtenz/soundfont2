@@ -15,7 +15,7 @@ beforeAll(async () => {
 describe('SoundFont2', () => {
   it('should not parse invalid SoundFonts', async () => {
     const buffer = await readFile(path.join(__dirname, 'fonts/invalid.sf2'));
-    expect(() => SoundFont2.from(buffer)).toThrow(ParseError);
+    expect(() => new SoundFont2(buffer)).toThrow(ParseError);
   });
 
   it('should parse metadata', () => {
