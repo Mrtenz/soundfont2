@@ -4,6 +4,17 @@ The `SampleHeader` object contains all the meta data for a sample.
 
 ## Table of Contents
 
+* [`SampleHeader.name`](#sampleheadername)
+* [`SampleHeader.start`](#sampleheaderstart)
+* [`SampleHeader.end`](#sampleheaderend)
+* [`SampleHeader.startLoop`](#sampleheaderstartloop)
+* [`SampleHeader.endLoop`](#sampleheaderendloop)
+* [`SampleHeader.sampleRate`](#sampleheadersamplerate)
+* [`SampleHeader.originalPitch`](#sampleheaderoriginalpitch)
+* [`SampleHeader.pitchCorrection`](#sampleheaderpitchcorrection)
+* [`SampleHeader.link`](#sampleheaderlink)
+* [`SampleHeader.type`](#sampleheadertype)
+
 ## `SampleHeader.name`
 
 * [&lt;string&gt;](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type) - The name of the sample.
