@@ -27,3 +27,6 @@ typings/
 
 # Webpack
 lib
+
+# Docs
+_book

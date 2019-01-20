@@ -1,0 +1,5 @@
+{
+  "root": "./docs",
+  "title": "Soundfont2",
+  "description": "A SoundFont2 parser for Node.js and web browsers"
+}
