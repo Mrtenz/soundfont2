@@ -1,0 +1,14 @@
+language: node_js
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+install:
+  - yarn --silent
+
+script:
+  - yarn run test
+  - yarn run tslint
+  - yarn run prettier:diff
