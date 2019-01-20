@@ -25,7 +25,7 @@
     "prepublishOnly": "yarn run clean && cross-env NODE_ENV=development yarn run build",
     "docs:serve": "gitbook serve",
     "docs:build": "gitbook build",
-    "docs:deploy": "gh-pages -d _book"
+    "docs:deploy": "yarn run docs:build && gh-pages -d _book"
   },
   "files": [
     "lib",
