@@ -18,6 +18,7 @@
   "scripts": {
     "tslint": "tslint --project .",
     "test": "jest",
+    "prettier:diff": "prettier --write --config ./.prettierrc --list-different 'src/**/*.ts'",
     "clean": "rimraf ./lib ./typings",
     "build": "yarn run build:declarations && webpack",
     "build:declarations": "tsc --project tsconfig.json --declaration --declarationDir typings --emitDeclarationOnly",
