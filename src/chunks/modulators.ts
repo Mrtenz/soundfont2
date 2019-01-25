@@ -1,7 +1,22 @@
 import { SF2Chunk } from '~/chunk';
-import { Modulator } from '~/types';
+import { Modulator, ModulatorValue } from '~/types';
 import { ParseError } from '~/riff';
 import { SF_MODULATOR_SIZE } from '~/constants';
+
+/**
+ * Get the modulator enumerator value from a 16-bit integer.
+ *
+ * @param {number} value - The 16-bit integer
+ */
+const getModulatorValue = (value: number): ModulatorValue => {
+  return {
+    type: (value >> 10) & 0x3f,
+    polarity: (value >> 9) & 1,
+    direction: (value >> 8) & 1,
+    palette: (value >> 7) & 1,
+    index: value & 0x7f
+  };
+};
 
 /**
  * Get the modulators from either a `pmod` (presets) or `imod` (instruments) chunk.
@@ -18,11 +33,13 @@ export const getModulators = (chunk: SF2Chunk, type: 'pmod' | 'imod'): Modulator
     throw new ParseError(`Invalid size for the '${type}' sub-chunk`);
   }
 
-  return chunk.iterate<Modulator>(iterator => ({
-    source: iterator.getInt16BE(),
-    id: iterator.getInt16BE(),
-    amount: iterator.getInt16BE(),
-    amountSource: iterator.getInt16BE(),
-    transform: iterator.getInt16BE()
-  }));
+  return chunk.iterate<Modulator>(iterator => {
+    return {
+      source: getModulatorValue(iterator.getInt16BE()),
+      id: iterator.getInt16BE(),
+      value: iterator.getInt16BE(),
+      valueSource: getModulatorValue(iterator.getInt16BE()),
+      transform: iterator.getInt16BE()
+    };
+  });
 };

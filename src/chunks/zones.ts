@@ -74,7 +74,7 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
         continue;
       }
 
-      const reference = references[referenceId.amount!];
+      const reference = references[referenceId.value!];
       if (!reference) {
         continue;
       }

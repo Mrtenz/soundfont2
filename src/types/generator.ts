@@ -476,20 +476,10 @@ export interface Generator {
   /**
    * Generator value. If the range is not specified, this should be set.
    */
-  amount?: number;
+  value?: number;
 
   /**
-   * The range of the generator. If the amount is not specified, this should be set.
+   * The range of the generator. If the value is not specified, this should be set.
    */
-  range?: {
-    /**
-     * Low value for the range.
-     */
-    lo: number;
-
-    /**
-     * High value for the range.
-     */
-    hi: number;
-  };
+  range?: Range;
 }
