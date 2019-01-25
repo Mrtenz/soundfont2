@@ -1,6 +1,6 @@
 import { GeneratorType } from './generator';
 
-export enum ModulatorType {
+export enum ControllerType {
   /**
    * The controller moves linearly from the minimum to the maximum value, with the direction and
    * polarity specified by the modulator.
@@ -58,14 +58,14 @@ export enum ControllerDirection {
 
 export enum ControllerPalette {
   /**
-   * Use the MIDI controller palette.
-   */
-  MidiController = 0,
-
-  /**
    * Use the general controller palette as described by the `Controller` enum.
    */
-  GeneralController = 1
+  GeneralController = 0,
+
+  /**
+   * Use the MIDI controller palette.
+   */
+  MidiController = 1
 }
 
 export enum Controller {
@@ -117,11 +117,11 @@ export enum Controller {
   Link = 127
 }
 
-export interface ModulatorValue {
+export interface ControllerValue {
   /**
    * The type of modulator.
    */
-  type: ModulatorType;
+  type: ControllerType;
 
   /**
    * The polarity of the modulator.
@@ -170,7 +170,7 @@ export interface Modulator {
   /**
    * Source modulator.
    */
-  source: ModulatorValue;
+  source: ControllerValue;
 
   /**
    * Degree of modulation.
@@ -182,10 +182,226 @@ export interface Modulator {
    *
    * TODO: Description is unclear. Should be improved.
    */
-  valueSource: ModulatorValue;
+  valueSource: ControllerValue;
 
   /**
    * Transform applied to source.
    */
   transform: TransformType;
 }
+
+/**
+ * The default modulators at instrument level. Implementing these is up to the consumer of this
+ * library. To override these modulators, other modulators have to be defined explicitly.
+ */
+export const DEFAULT_INSTRUMENT_MODULATORS: Modulator[] = [
+  // MIDI note-on velocity to initial attenuation
+  {
+    id: GeneratorType.InitialAttenuation,
+    source: {
+      type: ControllerType.Concave,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Decreasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoteOnVelocity
+    },
+    value: 960,
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI note-on velocity to filter cutoff
+  {
+    id: GeneratorType.InitialFilterFc,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Decreasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoteOnVelocity
+    },
+    value: -2400, // cents
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI channel pressure to vibrato LFO pitch depth
+  {
+    id: GeneratorType.VibLFOToPitch,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.ChannelPressure
+    },
+    value: 50, // cents / max excursion
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI continuous controller 1 to vibrato LFO pitch depth
+  {
+    id: GeneratorType.VibLFOToPitch,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.MidiController,
+      index: 1
+    },
+    value: 50,
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI continuous controller 7 to initial attenuation
+  {
+    id: GeneratorType.InitialAttenuation,
+    source: {
+      type: ControllerType.Concave,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Decreasing,
+      palette: ControllerPalette.MidiController,
+      index: 7
+    },
+    value: 960,
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI continuous controller 10 to pan position
+  {
+    id: GeneratorType.InitialAttenuation,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Bipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.MidiController,
+      index: 10
+    },
+    value: 1000, // tenths of a percent
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI continuous controller 11 to initial attenuation
+  {
+    id: GeneratorType.InitialAttenuation,
+    source: {
+      type: ControllerType.Concave,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Decreasing,
+      palette: ControllerPalette.MidiController,
+      index: 11
+    },
+    value: 960,
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI continuous controller 91 to reverb effects send
+  {
+    id: GeneratorType.ReverbEffectsSend,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.MidiController,
+      index: 91
+    },
+    value: 200, // tenths of a percent
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI continuous controller 93 to chorus effects send
+  {
+    id: GeneratorType.ChorusEffectsSend,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.MidiController,
+      index: 93
+    },
+    value: 200, // tenths of a percent
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.NoController
+    },
+    transform: TransformType.Linear
+  },
+
+  // MIDI pitch wheel to initial pitch controlled by MIDI pitch wheel sensitivity
+  {
+    id: GeneratorType.CoarseTune,
+    source: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Bipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.PitchWheel
+    },
+    value: 12700, // cents
+    valueSource: {
+      type: ControllerType.Linear,
+      polarity: ControllerPolarity.Unipolar,
+      direction: ControllerDirection.Increasing,
+      palette: ControllerPalette.GeneralController,
+      index: Controller.PitchWheelSensitivity
+    },
+    transform: TransformType.Linear
+  }
+];

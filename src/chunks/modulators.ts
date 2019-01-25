@@ -1,5 +1,5 @@
 import { SF2Chunk } from '~/chunk';
-import { Modulator, ModulatorValue } from '~/types';
+import { Modulator, ControllerValue } from '~/types';
 import { ParseError } from '~/riff';
 import { SF_MODULATOR_SIZE } from '~/constants';
 
@@ -8,7 +8,7 @@ import { SF_MODULATOR_SIZE } from '~/constants';
  *
  * @param {number} value - The 16-bit integer
  */
-const getModulatorValue = (value: number): ModulatorValue => {
+const getModulatorValue = (value: number): ControllerValue => {
   return {
     type: (value >> 10) & 0x3f,
     polarity: (value >> 9) & 1,
