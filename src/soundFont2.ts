@@ -115,39 +115,37 @@ export class SoundFont2 {
     memoizedPresetNumber: number = 0
   ): Key | null {
     // Get a memoized version of the function
-    return memoize(
-      (keyNumber: number, bankNumber: number, presetNumber: number): Key | null => {
-        const bank = this.banks[bankNumber];
-        if (bank) {
-          const preset = bank.presets[presetNumber];
-          if (preset) {
-            const presetZone = preset.zones.find(zone => this.isKeyInRange(zone, keyNumber));
-            if (presetZone) {
-              const instrument = presetZone.instrument;
-              const instrumentZone = instrument.zones.find(zone =>
-                this.isKeyInRange(zone, keyNumber)
-              );
-              if (instrumentZone) {
-                const sample = instrumentZone.sample;
-                const generators = { ...presetZone.generators, ...instrumentZone.generators };
-                const modulators = { ...presetZone.modulators, ...instrumentZone.modulators };
+    return memoize((keyNumber: number, bankNumber: number, presetNumber: number): Key | null => {
+      const bank = this.banks[bankNumber];
+      if (bank) {
+        const preset = bank.presets[presetNumber];
+        if (preset) {
+          const presetZone = preset.zones.find(zone => this.isKeyInRange(zone, keyNumber));
+          if (presetZone) {
+            const instrument = presetZone.instrument;
+            const instrumentZone = instrument.zones.find(zone =>
+              this.isKeyInRange(zone, keyNumber)
+            );
+            if (instrumentZone) {
+              const sample = instrumentZone.sample;
+              const generators = { ...presetZone.generators, ...instrumentZone.generators };
+              const modulators = { ...presetZone.modulators, ...instrumentZone.modulators };
 
-                return {
-                  keyNumber,
-                  preset,
-                  instrument,
-                  sample,
-                  generators,
-                  modulators
-                };
-              }
+              return {
+                keyNumber,
+                preset,
+                instrument,
+                sample,
+                generators,
+                modulators
+              };
             }
           }
         }
-
-        return null;
       }
-    )(memoizedKeyNumber, memoizedBankNumber, memoizedPresetNumber);
+
+      return null;
+    })(memoizedKeyNumber, memoizedBankNumber, memoizedPresetNumber);
   }
 
   /**
@@ -201,6 +199,7 @@ export class SoundFont2 {
       .map(preset => {
         return {
           header: preset.header,
+          globalZone: preset.globalZone,
           zones: preset.zones.map(zone => {
             return {
               keyRange: zone.keyRange,
@@ -238,6 +237,7 @@ export class SoundFont2 {
       .map(instrument => {
         return {
           header: instrument.header,
+          globalZone: instrument.globalZone,
           zones: instrument.zones.map(zone => {
             return {
               keyRange: zone.keyRange,

@@ -6,6 +6,7 @@ import {
   GeneratorType,
   Modulator,
   Zone,
+  ZoneItems,
   ZoneItemsWithReference,
   ZoneMap
 } from '~/types';
@@ -51,8 +52,8 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
   itemGenerators: Generator[],
   references: R[],
   referenceType: GeneratorType
-): { header: T; zones: ZoneItemsWithReference<R>[] }[] => {
-  const items: { header: T; zones: ZoneItemsWithReference<R>[] }[] = [];
+): { header: T; zones: ZoneItemsWithReference<R>[]; globalZone?: ZoneItems }[] => {
+  const items: { header: T; zones: ZoneItemsWithReference<R>[]; globalZone?: ZoneItems }[] = [];
 
   for (let i = 0; i < headers.length; i++) {
     const header = headers[i];
@@ -62,7 +63,7 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
     const end = next ? next.bagIndex : zones.length;
 
     const zoneItems: ZoneItemsWithReference<R>[] = [];
-
+    let globalZone;
     for (let j = start; j < end; j++) {
       const modulators = getModulators(j, zones, itemModulators);
       const generators = getGenerators(j, zones, itemGenerators);
@@ -71,6 +72,17 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
         generators[GeneratorType.KeyRange] && generators[GeneratorType.KeyRange]!.range;
       const referenceId = generators[referenceType];
       if (!referenceId) {
+        if (j - start === 0) {
+          // first item without reference = global zone
+          // Spec 7.3: If a preset has more than one zone, the first zone may be a global zone.
+          // A global zone is determined by the fact that the last generator in the list is not an Instrument generator.
+          // Spec 7.9: "Unless the zone is a global zone, the last generator in the list is a “sampleID” generator"
+          globalZone = {
+            keyRange,
+            modulators,
+            generators
+          };
+        }
         continue;
       }
 
@@ -89,6 +101,7 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
 
     items.push({
       header,
+      globalZone,
       zones: zoneItems
     });
   }

@@ -66,12 +66,7 @@ const node: Configuration = merge.smart(config, {
   output: {
     libraryTarget: 'commonjs2',
     filename: '[name].node.js'
-  },
-  plugins: [
-    new webpack.ProvidePlugin({
-      TextDecoder: ['util', 'TextDecoder']
-    })
-  ]
+  }
 });
 
 export default [browser, node];
