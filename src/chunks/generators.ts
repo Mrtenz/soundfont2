@@ -88,7 +88,7 @@ export const getGenerators = (chunk: SF2Chunk, type: 'pgen' | 'igen'): Generator
 
     return {
       id,
-      amount: iterator.getInt16BE()
+      value: iterator.getInt16BE()
     };
   });
 };
