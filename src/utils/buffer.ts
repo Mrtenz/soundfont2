@@ -7,5 +7,6 @@
  */
 export const getStringFromBuffer = (buffer: Uint8Array): string => {
   const decoded = new TextDecoder('utf8').decode(buffer);
-  return decoded.split(/\0/)[0].trim();
+  const nullIndex = decoded.indexOf('\0');
+  return (nullIndex === -1 ? decoded : decoded.slice(0, nullIndex)).trim();
 };
