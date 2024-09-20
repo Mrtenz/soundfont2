@@ -120,25 +120,29 @@ export class SoundFont2 {
       if (bank) {
         const preset = bank.presets[presetNumber];
         if (preset) {
-          const presetZone = preset.zones.find(zone => this.isKeyInRange(zone, keyNumber));
-          if (presetZone) {
-            const instrument = presetZone.instrument;
-            const instrumentZone = instrument.zones.find(zone =>
-              this.isKeyInRange(zone, keyNumber)
-            );
-            if (instrumentZone) {
-              const sample = instrumentZone.sample;
-              const generators = { ...presetZone.generators, ...instrumentZone.generators };
-              const modulators = { ...presetZone.modulators, ...instrumentZone.modulators };
-
-              return {
-                keyNumber,
-                preset,
-                instrument,
-                sample,
-                generators,
-                modulators
-              };
+          const presetZones = preset.zones.filter(zone => this.isKeyInRange(zone, keyNumber));
+          if (presetZones.length > 0) {
+            for (const presetZone of presetZones) {
+              const instrument = presetZone.instrument;
+              const instrumentZones = instrument.zones.filter(zone =>
+                this.isKeyInRange(zone, keyNumber)
+              );
+              if (instrumentZones.length > 0) {
+                for (const instrumentZone of instrumentZones) {
+                  const sample = instrumentZone.sample;
+                  const generators = { ...presetZone.generators, ...instrumentZone.generators };
+                  const modulators = { ...presetZone.modulators, ...instrumentZone.modulators };
+    
+                  return {
+                    keyNumber,
+                    preset,
+                    instrument,
+                    sample,
+                    generators,
+                    modulators
+                  };
+                }
+              }
             }
           }
         }
