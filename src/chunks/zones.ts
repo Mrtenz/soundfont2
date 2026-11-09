@@ -70,6 +70,8 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
 
       const keyRange =
         generators[GeneratorType.KeyRange] && generators[GeneratorType.KeyRange]!.range;
+      const velRange =
+        generators[GeneratorType.VelRange] && generators[GeneratorType.VelRange]!.range;
       const referenceId = generators[referenceType];
       if (!referenceId) {
         if (j - start === 0) {
@@ -79,6 +81,7 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
           // Spec 7.9: "Unless the zone is a global zone, the last generator in the list is a “sampleID” generator"
           globalZone = {
             keyRange,
+            velRange,
             modulators,
             generators
           };
@@ -93,6 +96,7 @@ export const getItemsInZone = <T extends { bagIndex: number }, R>(
 
       zoneItems.push({
         keyRange,
+        velRange,
         modulators,
         generators,
         reference

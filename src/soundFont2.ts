@@ -132,7 +132,7 @@ export class SoundFont2 {
                   const sample = instrumentZone.sample;
                   const generators = { ...presetZone.generators, ...instrumentZone.generators };
                   const modulators = { ...presetZone.modulators, ...instrumentZone.modulators };
-    
+
                   return {
                     keyNumber,
                     preset,
@@ -164,6 +164,20 @@ export class SoundFont2 {
       (zone.keyRange.lo <= keyNumber && zone.keyRange.hi >= keyNumber)
     );
   }
+
+  /**
+   * Checks if a MIDI velocity is in the range of a zone.
+   *
+   * @param {ZoneItems} zone - The zone to check
+   * @param {number} velocity - The MIDI velocity, must be between 0 and 127
+   */
+  private isVelInRange(zone: ZoneItems, velocity: number): boolean {
+    return (
+      zone.velRange === undefined ||
+      (zone.velRange.lo <= velocity && zone.velRange.hi >= velocity)
+    );
+  }
+
 
   /**
    * Parse the presets to banks.
@@ -207,6 +221,7 @@ export class SoundFont2 {
           zones: preset.zones.map(zone => {
             return {
               keyRange: zone.keyRange,
+              velRange: zone.velRange,
               generators: zone.generators,
               modulators: zone.modulators,
               instrument: zone.reference
@@ -245,6 +260,7 @@ export class SoundFont2 {
           zones: instrument.zones.map(zone => {
             return {
               keyRange: zone.keyRange,
+              velRange: zone.velRange,
               generators: zone.generators,
               modulators: zone.modulators,
               sample: zone.reference

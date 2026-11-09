@@ -30,6 +30,11 @@ export interface ZoneItems {
   keyRange?: Range;
 
   /**
+   * The velocity range for the zone.
+   */
+  velRange?: Range;
+
+  /**
    * The modulators in the zone.
    */
   modulators: ZoneMap<Modulator>;
